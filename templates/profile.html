@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+个人中心
+{% endblock %}
+
+{% block body %}
+{% if error_message %}
+<script>
+    alert("{{error_message}}");
+</script>
+{% endif %}
+<div class="container-lg justify-content-starter mt-5">
+
+    <div class="row mt-0 mb-5 py-5 px-3">
+
+        <div class="row-cols-1 justify-content-starter">
+            <div class="col-lg-10 offset-lg-1 text-center px-2 pb-5">
+                <h1>个人中心</h1>
+            </div>
+
+            <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                <p>邮箱：{{ request.user.username }}</p>
+            </div>
+
+            <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                <p>注册时间：{{ request.user.date_joined }}</p>
+            </div>
+
+            <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                <a href="{% url 'setpwd' %}">修改密码</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

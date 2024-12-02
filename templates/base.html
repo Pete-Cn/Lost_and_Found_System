@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  {% load static %}
+<head>
+  <title>{% block title %} {% endblock %}</title>
+
+  
+  <link rel="stylesheet" href="{% static '\bootstrap-5.3.0-alpha1-dist\css\bootstrap.min.css' %}">
+  <script src="{% static '\bootstrap-5.3.0-alpha1-dist\js\bootstrap.bundle.min.js' %}"></script>
+  <link rel="stylesheet" href="{% static '\css\main.css' %}">
+  {% block head %} {% endblock %}
+</head>
+
+<body class="container-fluid w-100">
+
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+      <a class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+          <use xlink:href="#bootstrap"></use>
+        </svg>
+      </a>
+
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <li><a href="{% url 'index' %}" class="nav-link px-2 link-secondary">首页</a></li>
+        <li><a href="{% url 'items:item' %}" class="nav-link px-2 link-dark">寻物</a></li>
+        <li><a href="{% url 'items:post_page' %}" class="nav-link px-2 link-dark">寻主</a></li>
+        <li><a href="#" class="nav-link px-2 link-dark">食用指南</a></li>
+      </ul>
+
+      <div class="col-md-3 text-end me-5">
+        {% if request.user.is_authenticated %}
+        <div class="me-2 btn text-end">
+          <a href="{% url 'profile' request.user.id %}">{{ request.user.username }}</a></div>
+        <a href="{% url 'logout' %}"><button type="button" class="btn btn-outline-primary me-2">注销</button></a>
+        {% else %}
+        <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-primary me-2">登录</button></a>
+        <a href="{% url 'signup' %}"><button type="button" class="btn btn-primary">注册</button></a>
+        {% endif %}
+
+  
+    </header>
+<div class="container-lg d-flex w-100">
+  {% block body %}
+  {% endblock %}
+</div>
+<footer class="py-3 my-4 footer">
+  <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+  </ul>
+  <p class="text-center text-muted">© 2024 Pete_w of ustc</p>
+</footer>
+
+
+</body>
+
+</html>

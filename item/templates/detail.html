@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+寻物
+{% endblock %}
+
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css\main.css' %}">
+
+<script>
+    function a() {
+        alert("确定您已经找到您的物品")
+    }
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="container-lg">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 text-center justify-content-center">
+            <div class="card container-lg p-0" style="max-width: 50%;">
+                {% if item.status %}
+                <div class="alert alert-success" role="alert">
+                    已被 {{ item.owner }} 找回
+                </div>
+                {% else %}
+                <div class="alert alert-danger" role="alert">
+                    未找回
+                </div>
+                {% endif %}
+                <div class="container-sm card-img-top img-thumbnail imagecontainer">
+                <img src="{{ MEDIA_URL }}{{ item.image }}" class="object-fit-sm-contain border rounded" alt="img">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-text">描述及特征：{{ item.note }}</h5>
+                    <p class="card-title">物品编号： No.{{ item.id }}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">发现时间：{{ item.found_date }}</li>
+                    <li class="list-group-item">发现地点：{{ item.campus_found }} {{ item.building_found }}</li>
+                    <li class="list-group-item">具体地点：{{ item.exact_position }}</li>
+                    <li class="list-group-item">现地点：
+                        {% if item.current_position %}
+                        {{ item.current_position }}
+                        {% else %}
+                        原处
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item">发现者：{{ item.founder }}</li>
+                </ul>
+                {% if item.status == False %}
+        
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">已找回</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

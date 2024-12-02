@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}
+注册
+{% endblock %}
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" href="{% static '\css\login.css' %}">
+
+<script>
+    function check() {
+        var username = document.forms["myform"]["username"].value;
+        var password = document.forms["myform"]["password"].value;
+        if (username == null || username == "") {
+            alert("用户名不能为空");
+            return false;
+        }
+        if (password == null || password == "") {
+            alert("密码不能为空");
+            return false;
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body %}
+{% if error_message %}
+<script>
+    alert("{{error_message}}");
+</script>
+{% endif %}
+<div class="container-lg d-flex justify-content-center mt-5">
+
+    <div class="border border-1 mt-5 mb-5 py-5 px-3">
+
+
+        <form name="myform" onsubmit="return check()" method="post" class="d-flex row align-items-center form-floating">
+            {% csrf_token %}
+            <div class="row-cols-1 justify-content-center">
+                <div class="col-lg-10 offset-lg-1 text-center px-2 pb-5">
+                    <h1>登录</h1>
+                </div>
+
+                <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                    <label>邮箱：</label>
+                    <input type="text" name="username" class="form-control form-control-md" id="floatingInput"
+                        placeholder="您的科大邮箱">
+                </div>
+
+                <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                    <label>密码：</label>
+                    <input type="password" name="password" class="form-control form-control-md" id="floatingPassword"
+                        placeholder="密码">
+                    <a href="{% url 'repwd' %}" class="float-md-end">忘记密码？</a>
+                </div>
+            </div>
+
+            <div class="row-cols-1 gy-2 mt-2 justify-content-center ">
+                <div class="col-lg-10 offset-lg-1 p-2 pb-4 text-center">
+                    <button class="w-100 btn btn-md btn-primary" type="submit">登录</button>
+                </div>
+                <div class="border-top border-1 col-lg-10 offset-lg-1 p-2 text-center">
+                    <p>没有账号？<a href="{% url 'signup' %}">注册</a></p>
+                    
+                </div>
+            </div>
+
+
+
+        </form>
+
+
+    </div>
+</div>
+
+{% endblock %}
