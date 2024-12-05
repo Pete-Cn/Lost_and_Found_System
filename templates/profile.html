@@ -5,17 +5,19 @@
 {% endblock %}
 
 {% block body %}
+
 {% if error_message %}
 <script>
     alert("{{error_message}}");
 </script>
 {% endif %}
-<div class="container-lg justify-content-starter mt-5">
+
+<div class="container-lg justify-content-starter mt-5 border">
 
     <div class="row mt-0 mb-5 py-5 px-3">
 
         <div class="row-cols-1 justify-content-starter">
-            <div class="col-lg-10 offset-lg-1 text-center px-2 pb-5">
+            <div class="col-lg-10 offset-lg-1 text-starter px-2 pb-5">
                 <h1>个人中心</h1>
             </div>
 
@@ -33,4 +35,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

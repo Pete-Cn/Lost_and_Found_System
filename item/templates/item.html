@@ -2,24 +2,20 @@
 {% load static %}
 
 {% block title %}
-寻物
+    寻物
 {% endblock %}
 
 {% block head %}
+
 <link rel="stylesheet" type="text/css" href="{% static '\css\main.css' %}">
-<script>
-    function check() {
-        document.getElementById("check1").checked = true;
-        alert("asdasd");
-    }
-</script>
 {% endblock %}
+
 
 {% block body %}
 
-
 <div class="container-fluid w-100">
     <div class="container border border-2 pt-3 mb-3">
+
         <form action="{% url 'items:item' %}" method="post">
             {% csrf_token %}
             <div class="row mt-0 mb-2 mx-0 d-flex">
@@ -28,34 +24,28 @@
                     <p>筛选条件</p>
                 </div>
                 <div class="col-lg-auto px-2 pb-1">
-                    <select name="campus_chosen" class="form-select form-select-lg border-1" aria-label=".form-select-lg example">
-                        <option selected value=0>全部校区</option>
+                    <select name="campus_chosen" class="form-select form-select-lg border-1" aria-label=".form-select-lg example" onchange="change()" id="campus_select">
+                            <option selected value=0 id=0>全部校区</option>
                         {% for campus in Campuss %}
-                        <option value="{{ campus.id }}">{{ campus.campus_name }}</option>
+                            <option value={{ campus.id }}>{{ campus.campus_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="col-lg-auto px-2 pb-1">
-                    <select name="building_chosen" class="form-select form-select-lg border-1" aria-label=".form-select-lg example">
-                        <option selected value=0>全部建筑</option>
-                        {% for building in Buildings %}
-                        <option value="{{ building.id }}">{{ building.building_name }}</option>
-                        {% endfor %}
-                    </select>
+                    <button id="building_box" type="button" onclick="changetag('0')" class="form-select form-select-lg border-1" aria-label=".form-select-lg example" data-bs-toggle="modal" data-bs-target="#tag">
+                        选择建筑
+                    </button>
                 </div>
 
                 <div class="col-lg-auto px-2 pb-1">
                     <select name="type_chosen" class="form-select form-select-lg border-1" aria-label=".form-select-lg example">
                         <option selected value=0>全部种类</option>
                         {% for item_type in Item_Types %}
-                        <option value="{{ item_type.id }}">{{ item_type.item_type_name }}</option>
+                            <option value={{ item_type.id }}>{{ item_type.item_type_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-
-
-
 
                 <div class="col-lg-auto px-2 pt-2">
                     <div class="text-center">
@@ -65,18 +55,23 @@
                 <div class="col-lg-auto text-center px-2 py-1">
                     <input name="begin_date" type="date" class="form-control border-1" id="timeInput" name="time">
                 </div>
-                <div class="col-lg-auto text-center px-2 py-1" style="font-size: large;">
+            </div>
+            <div class="row mt-0 mb-2 mx-0 d-flex">
+                <div class="col-lg-auto text-center px-2 pt-2">
+                    <p>按名称筛选</p>
+                </div>
+                <div class="col-lg-6 input">
+                    <input name="item_name" value="{{ default_name }}" type="text" class="form-control" placeholder="物品描述或特征" aria-describedby="basic-addon1">
+                </div>
 
+                <div class="col-lg-auto text-center px-2 py-1" style="font-size: large;">
                     <div class="form-check mt-1">
-                        {% if status %}
-                        <input class="form-check-input" type="checkbox" value="" name="status" id="check1"
-                            checked="true">
+                        {% if status == '1' %}
+                            <input class="form-check-input" type="checkbox" value="1" name="status" id="check1" checked="true">
                         {% else %}
-                        <input class="form-check-input" type="checkbox" value="" name="status" id="check1">
+                            <input class="form-check-input" type="checkbox" value="1" name="status" id="check1">
                         {% endif %}
-                        <label class="form-check-label" for="flexCheckDefault">
-                            仅未找回的物品
-                        </label>
+                        <label class="form-check-label" for="flexCheckDefault">只看未找回的物品</label>
                     </div>
                 </div>
                 <div class="col-lg-1 px-2 py-1">
@@ -85,98 +80,114 @@
             </div>
 
 
+            <div class="modal fade" id="tag" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header d-block pb-0">
+                            <h1 class="fs-5 mb-3">选择建筑</h1>
+                            <div class="row">
+                                {% for building_type in Building_Types %}
+                                    <div class="col-md-auto">
+                                        <button class="btn btn-light" type="button"
+                                            onclick="changetag('{{building_type.id}}')">
+                                            {{ building_type.type_name }}
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <select name="building_chosen" class="form-select" multiple id="building_select">
+                                <option value=0 id="0" class="p-2 fs-6" selected>全部建筑</option>
+                                {% for campus in Campuss %}
+                                    {% for building in campus.building_set.all %}
+                                        <option value={{ building.id }} class="building p-2 fs-6" id={{ campus.id }}*{{ building.type.id }}>{{ building.building_name }}</option>
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
+
         <div class="row mt-2 mb-3 mx-0 d-flex border-top border-1 pt-2">
             <div class="col-lg-auto px-3 pb-1 form-select-lg">
                 <p class="card-text">已选择</p>
             </div>
             <div class="col-lg-auto px-2 pb-1 form-select-lg">
                 <p class="card-text">
-                    {% if default_Campus %}
-                    {% for a in default_Campus %}
-                    {{ a.campus_name }}
-                    {% endfor %}
-                    {% else %}
-                    全部校区
-                    {% endif %}
+
                 </p>
             </div>
             <div class="col-lg-auto px-2 pb-1 form-select-lg">
                 <p class="card-text">
                     {% if default_Building %}
-                    {% for a in default_Building %}
-                    {{ a.building_name }}
-                    {% endfor %}
+                        {% for building in default_Building %}
+                            {{ building }}
+                        {% endfor %}
                     {% else %}
-                    全部建筑
+                        全部建筑
                     {% endif %}
                 </p>
             </div>
             <div class="col-lg-auto px-2 pb-1 form-select-lg">
                 <p class="card-text">
                     {% if default_Type %}
-                    {% for a in default_Type %}
-                    {{ a.item_type_name }}
-                    {% endfor %}
+                        {% for a in default_Type %}
+                            {{ a.item_type_name }}
+                        {% endfor %}
                     {% else %}
-                    全部种类
+                        全部种类
                     {% endif %}
                 </p>
             </div>
             <div class="col-lg-auto px-2 pb-1 form-select-lg">
                 <p class="card-text">
-                    {% if default_date %}
-                    {{ default_date }} 以后
+                    {% if default_date != "2022-02-02" %}
+                        {{ default_date }} 以后
                     {% else %}
-                    所有时间
+                        所有时间
                     {% endif %}
                 </p>
             </div>
-
         </div>
     </div>
-
-
 
     <div class="float-none album py-2 mb-2 bg-light mb-3">
         <div class="container">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                 {% if Items %}
-                {% for item in Items reversed %}
-
-
-                <div class="col">
-
-                    <div class="card shadow-sm text-center m-1">
-                        {% if item.status %}
-                        <div class="alert alert-success" role="alert">
-                            已被找回
-                        </div>
-                        {% else %}
-                        <div class="alert alert-danger" role="alert">
-                            未找回
-                        </div>
-                        {% endif %}
-                        <a href="{% url 'items:detail' item.id %}">
-                            <div class="container-sm card-img-top img-thumbnail imagecontainer mt-2">
-                                <img src="{{ MEDIA_URL }}{{ item.image }}" class="object-fit-sm-contain border rounded"
-                                    alt="img">
+                    {% for item in Items reversed %}
+                        <div class="col">
+                            <div class="card shadow-sm text-center m-1">
+                                {% if item.status %}
+                                    <div class="alert alert-success" role="alert">已被找回</div>
+                                {% else %}
+                                    <div class="alert alert-danger" role="alert">未找回</div>
+                                {% endif %}
+                                <a href="{% url 'items:detail' item.id %}">
+                                    <div class="container-sm card-img-top img-thumbnail imagecontainer mt-2">
+                                        <img src="{{ MEDIA_URL }}{{ item.image }}" class="object-fit-sm-contain border rounded" alt="img">
+                                    </div>
+                                </a>
+                                <div class="card-body">
+                                    <p class="card-text">物品描述： {{ item.note }}</p>
+                                    <p class="card-text">发现时间：{{ item.found_date }}</p>
+                                    <p class="card-text">发现地点：{{ item.campus_found }} {{ item.building_found }}</p>
+                                    <p class="card-text mb-3">具体地点：{{ item.exact_position }}</p>
+                                </div>
                             </div>
-                        </a>
-                        <div class="card-body">
-                            <p class="card-text">描述及特征： {{ item.note }}</p>
-                            <p class="card-text">发现时间：{{ item.found_date }}</p>
-                            <p class="card-text">发现地点：{{ item.campus_found }} {{ item.building_found }}</p>
-                            <p class="card-text mb-3">具体地点：{{ item.exact_position }}</p>
-
-
-
                         </div>
-                    </div>
-                </div>
-                {% endfor %}
+                    {% endfor %}
                 {% else %}
-                <p class="card-text">没有符合条件的物品</p>
+                    p class="card-text">没有符合条件的物品</p>
                 {% endif %}
             </div>
         </div>
@@ -210,7 +221,9 @@
             </div>
         </div>
     </div>
+
 </div>
-</div>
+
+<script src="{% static '\js\item.js' %}"></script>
 
 {% endblock %}

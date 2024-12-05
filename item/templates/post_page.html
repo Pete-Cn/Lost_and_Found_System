@@ -2,128 +2,123 @@
 {% load static %}
 
 {% block title %}
-寻主
+    寻主
 {% endblock %}
 
 {% block head %}
 
-<link rel="stylesheet" href="{% static 'css\main.css' %}">
+<link rel="stylesheet" href="{% static '\css\main.css' %}">
 
-<script>
-    function check() {
-        var campus_found= document.forms["myform"]["campus_found"].value;
-        var building_found = document.forms["myform"]["building_found"].value;
-        var type = document.forms["myform"]["type"].value;
-        if (campus_found == 0) {
-            alert("请选择校区");
-            return false;
-        }
-        if (building_found == 0) {
-            alert("请选择建筑");
-            return false;
-        }
-        if (type == 0) {
-            alert("请选择物品种类");
-            return false;
-        }
-    }
-    
-
-</script>
 {% endblock %}
 
 {% block body %}
 
 <div class="container-lg d-flex justify-content-center mt-4 w-50 p-5">
-
-    <div class="border border-1 mt-5 mb-5 py-5 px-3">
-
-        <form enctype="multipart/form-data" action="{% url 'items:post_page' %}" name="myform" onsubmit="return check()" method="post" class="row align-items-center form-floating">
+    <div class="border border-1 mt-4 mb-5 py-5 px-3">
+        <form enctype="multipart/form-data" action="{% url 'items:post_page' %}" name="myform" onsubmit="return check()"
+            method="post" class="row align-items-center form-floating">
             {% csrf_token %}
-
             <div class="row mx-0 gy-2 mb-1 justify-content-center">
                 <div class="col-lg-10 text-center p-1">
                     <h1>发布寻主公告</h1>
                 </div>
                 <div class="col-lg-5 text-center p-1">
-                <select name="campus_found" class="form-select form-select-md"
-                aria-label=".form-select-md example">
-                    <option selected value=0>选择校区</option>
-                    {% for campus in Campuss %}
-                    <option value="{{ campus.id }}">{{ campus.campus_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-lg-5 text-center p-1">
-                <select name="building_found" class="form-select form-select-md"
-                aria-label=".form-select-md example">
-                    <option selected value=0>选择建筑</option>
-                    {% for building in Buildings %}
-                    <option value="{{ building.id }}">{{ building.building_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-lg-10 text-center p-1">
-                <input type="text" name="exact_position" class="form-control form-control-md" id="floatingInput" placeholder="精确位置">
-            </div>
-            <div class="col-lg-10 text-center p-1">
-                <input type="text" name="current_position" class="form-control form-control-md" id="floatingInput" placeholder="现位置（不填即为原处）">
-            </div>
-        </div>
-
-            <div class="row mx-0 gy-2 justify-content-center">
-                <div class="col-lg-10 text-center p-2">
-                    <select name="type" class="form-select form-select-md"
-                    aria-label=".form-select-md example">
-                        <option selected value=0>选择类型</option>
-                        {% for item_type in Item_Types %}
-                        <option value="{{ item_type.id }}">{{ item_type.item_type_name }}</option>
+                    <select name="campus_found" class="form-select form-select-lg" aria-label=".form-select-lg example"
+                        onchange="change()" id="campus_select">
+                        <option selected value=0 id=0>选择校区</option>
+                        {% for campus in Campuss %}
+                        <option value="{{ campus.id }}">{{ campus.campus_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-lg-10 text-center">
-                    <input type="text" name="note" class="form-control form-control-md" id="floatingInput" placeholder="特征">
+
+                <div class="col-lg-5 p-1">
+                    <button id="building_box" type="button" onclick="changetag('0')"
+                        class="form-select form-select-lg border-1" aria-label=".form-select-lg example"
+                        data-bs-toggle="modal" data-bs-target="#tag">
+                        选择建筑
+                    </button>
                 </div>
-                <div class="col-lg-10 mt-2">
-                    <label>图片：</label>
+
+                <div class="col-lg-10 text-center p-1">
+                    <input type="text" name="exact_position" class="form-control form-control-lg" id="floatingInput"
+                        placeholder="精确位置">
+                </div>
+                <div class="col-lg-10 text-center p-1">
+                    <input type="text" name="current_position" class="form-control form-control-lg" id="floatingInput"
+                        placeholder="现位置（不填即为原处）">
+                </div>
+
+                <div class="col-lg-10 text-center p-2">
+                    <select name="type" class="form-select form-select-lg" aria-label=".form-select-md example">
+                        <option selected value=0>选择类型</option>
+                        {% for item_type in Item_Types %}
+                            <option value="{{ item_type.id }}">{{ item_type.item_type_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-lg-10 text-center p-1">
+                    <input type="text" name="note" class="form-control form-control-lg" id="floatingInput"
+                        placeholder="物品描述">
+                </div>
+
+                <div class="col-lg-12 mt-2 text-center">
+                    <label>物品图片：</label>
                     <input type="file" id="imageInput" name="newimg" accept="image/*" class="mb-3">
                     <div id="imagebox" class="text-center p-2 imagecontainer" style="display: none;">
                         <label>预览：</label>
-                        <img id="imagePreview" src="#" alt="Image preview"  />
-                    
+                        <img id="imagePreview" src="#" alt="Image preview" />
+
                     </div>
                 </div>
-                
+
             </div>
 
-            
-            
             <div class="row-cols-1 gy-2 me-0 justify-content-center ">
                 <div class="col-lg-10 offset-lg-1 p-2 text-center">
                     <button class="w-100 btn btn-lg btn-primary" type="submit">发布</button>
                 </div>
             </div>
 
+            <div class="modal fade" id="tag" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header d-block pb-0">
+                            <h1 class="fs-5 mb-3">选择建筑</h1>
+                            <div class="row">
+                                {% for building_type in Building_Types %}
+                                <div class="col-md-auto">
+                                    <button class="btn btn-light" type="button"
+                                        onclick="changetag('{{building_type.id}}')">
+                                        {{ building_type.type_name }}
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <select name="building_found" class="form-select" multiple id="building_select">
+                                <option value=0 id="0" class="p-2 fs-6" selected>全部建筑</option>
+                                {% for campus in Campuss %}
+                                {% for building in campus.building_set.all %}
+                                <option value={{ building.id }} class="building p-2 fs-6" id={{ campus.id }}*{{
+                                    building.type.id }}>{{ building.building_name }}</option>
+                                {% endfor %}
+                                {% endfor %}
+                            </select>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                    onclick="changebuilding()">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </form>
-
     </div>
 </div>
-<script>
-    var imagebox = document.getElementById('imagebox');
-    document.getElementById('imageInput').addEventListener('change', function() {
-    var file = this.files[0];
-    var reader = new FileReader();
-
-    if (file) {
-        reader.onload = function(e) {
-            var img = document.getElementById('imagePreview');
-            img.src = e.target.result;
-            img.style.display = 'inline';
-            imagebox.style.display = 'inline';
-        };
-        reader.readAsDataURL(file);
-    }
-});
-</script>
+<script src="{% static '\js\post_page.js' %}"></script>
 {% endblock %}

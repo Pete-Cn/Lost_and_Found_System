@@ -12,9 +12,16 @@ class Campus(models.Model):
     def __str__(self):
         return self.campus_name
 
+class Building_Type(models.Model):
+    type_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.type_name
+
 class Building(models.Model):
     building_name = models.CharField(max_length=10)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, default='')
+    type = models.ForeignKey(Building_Type, on_delete=models.CASCADE, default='')
 
     def __str__(self):
         return self.building_name

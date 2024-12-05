@@ -159,7 +159,7 @@ def reset_pwd(request):
 @login_required
 def set_pwd(request):
     if request.method == "POST":
-        new_pwd = request.POST.get('pwd1')
+        new_pwd = request.POST.get('password1')
         try:
             user = User.objects.get(id=request.user.id)
             user.set_password(new_pwd)

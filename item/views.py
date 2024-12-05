@@ -5,28 +5,35 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
+from urllib.parse import parse_qs
 
-from .models import Item, Campus, Building, Item_type
+from .models import Item, Campus, Building, Item_type, Building_Type
 
 # Create your views here.
+def search_url(campus_chosen, building_list, type_chosen, status, begindate, item_name):
+    return "?" + "campus=" + campus_chosen + "&building=" + building_list + "&type=" + type_chosen + "&status=" + status + "&date=" + begindate + "&name=" + item_name
+
 def item(request):
     if request.method == "POST":
         campus_chosen = request.POST.get('campus_chosen')
-        building_chosen = request.POST.get('building_chosen')
         type_chosen = request.POST.get('type_chosen')  
         status = request.POST.get('status')
         begindate = request.POST.get('begin_date')
+        building_list = request.POST.getlist('building_chosen')
+        item_name = request.POST.get('item_name')
 
         if begindate == '':
             begindate = datetime(2022, 2, 2).strftime("%Y-%m-%d")
 
+        if item_name is None:
+            item_name = ''
         
-        if status == None:
-            status = 0
-        else:
-            status = 1
-        
-        return redirect(reverse("items:search", kwargs={'campus_id': campus_chosen, 'building_id': building_chosen, 'type_id': type_chosen, 'status': status, 'date': str(begindate) }))
+        if status is None:
+            status = '0'
+
+        building_list_str = ','.join(building_list)
+        url = reverse("items:search") + search_url(campus_chosen, building_list_str, type_chosen, str(status), begindate, item_name)
+        return redirect(url)
     else:
         Item_list = Item.objects.all()
 
@@ -45,6 +52,7 @@ def item(request):
             "Items": Items,
             #Item.objects.order_by("-found_date")[:5],
             "Campuss": Campus.objects.all,
+            "Building_Types": Building_Type.objects.all,
             "Buildings": Building.objects.all,
             "Item_Types": Item_type.objects.all,
             "default_Campus": '',
@@ -63,33 +71,45 @@ def detail(request, item_id):
 
     return render(request, "detail.html", {"item": current_item})
 
-def search(request, campus_id, building_id, type_id, status, date):
+def search(request):
     
-    campus_chosen = campus_id
-    building_chosen = building_id
-    type_chosen = type_id
+    campus_chosen = request.GET.get('campus')
+    building_list_str = request.GET.get('building')
+    type_chosen = request.GET.get('type')
+    status = request.GET.get('status')
+    date = request.GET.get('date')
+    item_name = request.GET.get('name')
 
-    q = Q()
-    q.connector = "and"      
-    if status == 1:
+    building_list = building_list_str.split(',')
+    building_name_list = ['']
+
+    q = Q() 
+    q2 = Q()
+    q.connector = "and"
+    q2.connector = "or"      
+    if status == '1':
         q.children.append(('status', False))
 
-    if campus_chosen != 0 :
-        q.children.append(('campus_found', campus_chosen))
+    if campus_chosen != '0' :
+        q.children.append(('campus_found', int(campus_chosen)))
 
-    if building_chosen != 0:
-        q.children.append(('building_found', building_chosen))
+    if building_list[0] == '0':
+        building_name_list.append("全部建筑")
+    else:
+        for building_chosen in building_list:
+            q2.children.append(('building_found', int(building_chosen)))
+            building_name_list.append(Building.objects.get(pk=int(building_chosen)).building_name)
     
-    if type_chosen != 0:
-        q.children.append(('type', type_chosen))     
+    if type_chosen != '0':
+        q.children.append(('type', int(type_chosen)))     
 
+    begin_date = datetime.strptime(date, "%Y-%m-%d")
+    q.children.append(Q(("found_date__gte", begin_date)))
 
-    if date is not None:
-        begin_date = datetime.strptime(date, "%Y-%m-%d")
-        q.children.append(Q(("found_date__gte", begin_date)))
-#       qualified_items = Item.objects.filter(Q(found_date__gte=begin_date) | q) 
-#    else:
-    qualified_items = Item.objects.filter(q)
+    if item_name is not None:
+        q.children.append(("note__icontains", item_name))
+    
+    qualified_items = Item.objects.filter(q | q2)
     
     if qualified_items.exists:
         paginator = Paginator(qualified_items, 9)
@@ -104,19 +124,18 @@ def search(request, campus_id, building_id, type_id, status, date):
     else:
         Items = None
     
-
-        
-
     context = {
         "Items": Items,
         "Campuss": Campus.objects.all,
         "Buildings": Building.objects.all,
+        "Building_Types": Building_Type.objects.all,
         "Item_Types": Item_type.objects.all,
-        "status": bool(status),
+        "status": status,
         "default_Campus": Campus.objects.filter(pk=campus_chosen),
-        "default_Building": Building.objects.filter(pk=building_chosen),
+        "default_Building": building_name_list,
         "default_Type": Item_type.objects.filter(pk=type_chosen),
         "default_date": date,
+        "default_name": item_name,
     }
     return render(request, "item.html", context)
     
@@ -125,8 +144,8 @@ def post_page(request):
     if request.method == "POST":
         CP = request.POST.get("current_position")
         img_uploaded = request.FILES.get("newimg")
-        name=request.FILES.get('newimg').name
         print(img_uploaded)
+
         newitem = Item(
             found_date=datetime.now(), 
             note=request.POST.get("note"), 
@@ -139,18 +158,20 @@ def post_page(request):
             founder=request.user.username,
             image=img_uploaded,
         )
-        print(newitem)
-        print(CP)
 
-        try: 
-            newitem.save()
-            return redirect(reverse("items:item"))
-        except:
-            return HttpResponse("发布失败")
+        if newitem.building_found.campus != newitem.campus_found:
+            return HttpResponse("请选择正确的校区和建筑")
+        else:
+            try: 
+                newitem.save()
+                return redirect(reverse("items:item"))
+            except:
+                return HttpResponse("发布失败")
     else:
         context = {
             "Campuss": Campus.objects.all,
             "Buildings": Building.objects.all,
+            "Building_Types": Building_Type.objects.all,
             "Item_Types": Item_type.objects.all,
         }
         return render(request, "post_page.html", context)

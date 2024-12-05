@@ -1,29 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    找回密码
+    重置密码
 {% endblock %}
 
 {% block head %}
-<script>
-    function check() {
-        var old_pwd = document.forms["myform"]["old_pwd"].value;
-        var pwd1 = document.forms["myform"]["pwd1"].value;
-        var pwd2 = document.forms["myform"]["pwd2"].value;
-        if (old_pwd == null || old_pwd == "" ) {
-            alert("原密码不能为空");
-            return false;
-        }
-        if (pwd1 == null || pwd1 == "" || pwd2 == null || pwd2 == "") {
-            alert("密码不能为空");
-            return false;
-        }
-        if (pwd1 != pwd2) {
-            alert("两次密码不一致");
-            return false;
-        }
-    }
-</script>
+
 {% endblock %}
 
 {% block body %}
@@ -34,9 +16,7 @@
 
 {% endif %}
 <div class="container-lg d-flex justify-content-center mt-5 w-50">
-
     <div class="border border-1 mt-5 mb-5 py-5 px-3">
-
 
         <form name="myform" onsubmit="return check()" method="post" class="d-flex row align-items-center form-floating">
             {% csrf_token %}
@@ -47,13 +27,11 @@
 
                 <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
                     <label>新密码：</label>
-                    <input type="password" name="pwd1" class="form-control form-control-md" id="floatingPassword"
-                        placeholder="新密码">
+                    <input type="password" name="password1" class="form-control form-control-md" placeholder="新密码">
                 </div>
                 <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
                     <label>重复密码：</label>
-                    <input type="password" name="pwd2" class="form-control form-control-md" id="floatingPassword"
-                        placeholder="重复密码">
+                    <input type="password" name="password2" class="form-control form-control-md" placeholder="重复密码">
                 </div>
             </div>
 
@@ -62,19 +40,12 @@
                     <button class="w-100 btn btn-md btn-primary" type="submit" id="submit">修改密码</button>
                 </div>
             </div>
-
-
-
         </form>
-
 
     </div>
 </div>
-<script>
-    document.getElementById('submit').addEventListener('click', function() {
-        setTimeout(() => {
-        this.disabled = true;
-    }, 5); 
-    });
-</script>
+
+<script scr="{% static '\js\check.js' %}"></script>
+<script scr="{% static '\js\set_pwd.js' %}"></script>
+
 {% endblock %}

@@ -8,7 +8,7 @@ app_name = "items"
 urlpatterns = [
     path("", views.item, name="item"),
     path("detail/<int:item_id>/", views.detail, name="detail"),
-    path("search/<int:campus_id>/<int:building_id>/<int:type_id>/<int:status>/<str:date>/", views.search, name="search"),
+    path("search/", views.search, name="search"),
 #    path("search/c/<int:campus_id>/", views.item, name="item_c"),
     path("post/", views.post_page, name="post_page"),
      

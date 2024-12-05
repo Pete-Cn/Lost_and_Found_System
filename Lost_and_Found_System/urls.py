@@ -27,9 +27,10 @@ urlpatterns = [
     path('signup/', views.signup_page, name="signup"),
     path('active/', views.active, name="active"),
     path('logout/', views.logout_page, name="logout"),
-    path('item/', include("item.urls")),
     path('profile/<int:user_id>', views.profile, name="profile"),
     path('repwd/', views.repwd, name="repwd"),
     path('reset/', views.reset_pwd, name="reset"),
-    path('setpwd/', views.set_pwd, name="setpwd")
+    path('setpwd/', views.set_pwd, name="setpwd"),
+    path('item/', include("item.urls")),
+    path('', include("board.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
