@@ -5,13 +5,13 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
-from urllib.parse import parse_qs
-
+from pathlib import os
 from .models import Item, Campus, Building, Item_type, Building_Type
 
+import csv
 # Create your views here.
-def search_url(campus_chosen, building_list, type_chosen, status, begindate, item_name):
-    return "?" + "campus=" + campus_chosen + "&building=" + building_list + "&type=" + type_chosen + "&status=" + status + "&date=" + begindate + "&name=" + item_name
+def search_url(campus_chosen, building_list, type_chosen, status, begindate, key, wordTag):
+    return "?" + "campus=" + campus_chosen + "&building=" + building_list + "&type=" + type_chosen + "&status=" + status + "&date=" + begindate + "&key=" + key + "&wordTag=" + wordTag
 
 def item(request):
     if request.method == "POST":
@@ -20,19 +20,20 @@ def item(request):
         status = request.POST.get('status')
         begindate = request.POST.get('begin_date')
         building_list = request.POST.getlist('building_chosen')
-        item_name = request.POST.get('item_name')
-
+        key = request.POST.get('key')
+        wordTag = request.POST.get('wordTag')
+        print(key)
         if begindate == '':
             begindate = datetime(2022, 2, 2).strftime("%Y-%m-%d")
 
-        if item_name is None:
-            item_name = ''
+        if key is None:
+            key = ''
         
         if status is None:
             status = '0'
 
         building_list_str = ','.join(building_list)
-        url = reverse("items:search") + search_url(campus_chosen, building_list_str, type_chosen, str(status), begindate, item_name)
+        url = reverse("items:search") + search_url(campus_chosen, building_list_str, type_chosen, str(status), begindate, key, wordTag)
         return redirect(url)
     else:
         Item_list = Item.objects.all()
@@ -78,15 +79,18 @@ def search(request):
     type_chosen = request.GET.get('type')
     status = request.GET.get('status')
     date = request.GET.get('date')
-    item_name = request.GET.get('name')
+    key = request.GET.get('key')
+    wordTag = request.GET.get('wordTag')
 
     building_list = building_list_str.split(',')
     building_name_list = ['']
 
     q = Q() 
     q2 = Q()
+    q3 = Q()
     q.connector = "and"
-    q2.connector = "or"      
+    q2.connector = "or"
+    q3.connector = "or"      
     if status == '1':
         q.children.append(('status', False))
 
@@ -106,10 +110,18 @@ def search(request):
     begin_date = datetime.strptime(date, "%Y-%m-%d")
     q.children.append(Q(("found_date__gte", begin_date)))
 
-    if item_name is not None:
-        q.children.append(("note__icontains", item_name))
-    
-    qualified_items = Item.objects.filter(q | q2)
+    if key is not None:
+        if wordTag == '1':
+            q3.children.append(("exact_position__icontains", key))
+        elif wordTag == '2':
+            q3.children.append(("note__icontains", key))
+            q3.children.append(("name__icontains", key))
+        else:
+            q3.children.append(("note__icontains", key))
+            q3.children.append(("name__icontains", key))
+            q3.children.append(("exact_position__icontains", key))
+
+    qualified_items = Item.objects.filter((q | q2) & q3)
     
     if qualified_items.exists:
         paginator = Paginator(qualified_items, 9)
@@ -135,7 +147,8 @@ def search(request):
         "default_Building": building_name_list,
         "default_Type": Item_type.objects.filter(pk=type_chosen),
         "default_date": date,
-        "default_name": item_name,
+        "default_key": key,
+        "default_tag": wordTag,
     }
     return render(request, "item.html", context)
     
@@ -155,6 +168,7 @@ def post_page(request):
             type=Item_type.objects.get(pk=request.POST.get("type")),
             campus_found=Campus.objects.get(pk=request.POST.get("campus_found")),
             building_found=Building.objects.get(pk=request.POST.get("building_found")),
+            name=request.POST.get("name"),
             founder=request.user.username,
             image=img_uploaded,
         )
@@ -175,3 +189,23 @@ def post_page(request):
             "Item_Types": Item_type.objects.all,
         }
         return render(request, "post_page.html", context)
+
+def loaddata(request):
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data.csv')
+    data = []
+    with open(path, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            data.append(row)
+    dict1 = {}
+    dict2 = {}
+    for i in range(1, 6):
+        dict1[str(i)] = Campus.objects.get(pk=i)
+
+    for i in range(1, 7):
+        dict2[str(i)] = Building_Type.objects.get(pk=i)   
+    for row in data:
+        newbuilding = Building(building_name = row[1], campus = dict1[row[0]], type = dict2[row[2]])
+        newbuilding.save()
+        print(row[0])
+    return HttpResponse(data)

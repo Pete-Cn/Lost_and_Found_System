@@ -11,5 +11,6 @@ urlpatterns = [
     path("search/", views.search, name="search"),
 #    path("search/c/<int:campus_id>/", views.item, name="item_c"),
     path("post/", views.post_page, name="post_page"),
+    path("load/", views.loaddata, name="loaddata"),
      
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

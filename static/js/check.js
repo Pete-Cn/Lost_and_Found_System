@@ -1,5 +1,5 @@
-document.getElementById('submit').addEventListener('click', function() {
+document.getElementById('submit').addEventListener('click', function () {
     setTimeout(() => {
-    this.disabled = true;
-}, 5); 
+        this.disabled = true;
+    }, 5);
 });

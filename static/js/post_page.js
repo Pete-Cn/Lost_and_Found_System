@@ -2,15 +2,20 @@ function check() {
     var campus_found = document.forms["myform"]["campus_found"].value;
     var building_found = document.forms["myform"]["building_found"].value;
     var type = document.forms["myform"]["type"].value;
+    var name = document.forms["myform"]["name"].value;
     if (campus_found == 0 || campus_found == null) {
         alert("请选择校区");
         return false;
     }
-    if (building_found == 0 || building_found == null) {
+    if (name == "0" || name == null) {
+        alert("名称不能为空");
+        return false;
+    }
+    if (building_found == "0" || building_found == null) {
         alert("请选择建筑");
         return false;
     }
-    if (type == 0 || type == null) {
+    if (type == "0" || type == null) {
         alert("请选择物品种类");
         return false;
     }
@@ -33,9 +38,20 @@ function changetag(building_type) {
 function changebuilding() {
     var building = document.getElementById('building_box');
     var building_selected = document.getElementById('building_select');
-    var building_name = building_selected.options[building_selected.selectedIndex].text;
-    if (building_name != "") 
-        building.innerHTML=building_name;
+    var str = [];
+    for(var i = 0; i < building_selected.length; i++) {
+        if (building_selected[i].selected) {
+            str.push(building_selected[i].text);
+        }
+    }
+    if (str.length > 1) {
+        alert("只能选择一个建筑");
+        for(var i = 0; i < building_selected.length; i++) {
+            building_selected[i].selected = false;
+        }
+        return;
+    } 
+    building.innerHTML = str[0];
 }
 
 document.getElementById('imageInput').addEventListener('change', function () {

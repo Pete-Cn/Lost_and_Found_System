@@ -30,8 +30,10 @@
                     <img src="{{ MEDIA_URL }}{{ item.image }}" class="object-fit-sm-contain border rounded" alt="img">
                 </div>
                 <div class="card-body">
-                    <h5 class="card-text">描述及特征：{{ item.note }}</h5>
-                    <p class="card-title">物品编号： No.{{ item.id }}</p>
+                    <h5 class="card-text">物品名称：{{ item.name }}</h5>
+                    {% if item.note %}
+                        <p class="card-title">物品特征： {{ item.note }}</p>
+                    {% endif %}
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">发现时间：{{ item.found_date }}</li>

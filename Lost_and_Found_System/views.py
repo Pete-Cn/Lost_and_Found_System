@@ -5,8 +5,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from .forms import SignUpForm, User 
 from django.contrib.auth.decorators import login_required
-from . import settings
 
+from . import settings
 import uuid, time
 import datetime
 

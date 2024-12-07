@@ -34,7 +34,7 @@ class Item_type(models.Model):
 
 class Item(models.Model):
     found_date = models.DateField("date_found")
-
+    name = models.CharField(max_length=100, default='')
     note = models.CharField(max_length=100, default="")
     status = models.BooleanField(default=False)
     exact_position = models.CharField(max_length=100, default='', blank=True, null=True)
