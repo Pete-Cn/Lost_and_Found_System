@@ -21,7 +21,7 @@ class Building_Type(models.Model):
 class Building(models.Model):
     building_name = models.CharField(max_length=10)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, default='')
-    type = models.ForeignKey(Building_Type, on_delete=models.CASCADE, default='')
+    type = models.ForeignKey(Building_Type, on_delete=models.CASCADE, default='', blank=True)
 
     def __str__(self):
         return self.building_name

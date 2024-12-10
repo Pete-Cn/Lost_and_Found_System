@@ -4,8 +4,11 @@
     找回密码
 {% endblock %}
 
-{% block body %}
+{% block head %}
+{% load static %}
+{% endblock %}
 
+{% block body %}
 {% if error_message %}
 <script>
     alert("{{error_message}}");

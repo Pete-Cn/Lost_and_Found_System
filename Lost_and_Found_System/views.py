@@ -49,6 +49,7 @@ def signup_page(request):
         form = SignUpForm(request.POST)
 
         form.is_valid()
+        print(form)
         username = form.cleaned_data["username"]
         password = form.cleaned_data['password1']
 
