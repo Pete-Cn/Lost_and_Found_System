@@ -193,19 +193,30 @@ def post_page(request):
 @login_required
 def loaddata(request):
     if request.user.is_staff == True:
+        campus_name = ['东校区', '西校区', '中校区', '南校区', '北校区' ]
+        building_type = ['校内场馆', '教学科研', '学生宿舍', '行政办公', '家属住宅', '文化风景', '其他位置']    
+        dict1 = {}
+        dict2 = {}
+        for i in range(0, 7):
+            newType = Building_Type(type_name = building_type[i])
+            dict2[str(i + 1)] = newType
+            newType.save()
+        for i in range(0, 5):
+            newCampus = Campus(campus_name = campus_name[i])
+            newCampus.save()
+            dict1[str(i + 1)] = newCampus
+            newbuilding = Building(building_name = f"其他位置( {campus_name[i]} )", campus = dict1[str(i + 1)], type = dict2['7'])
+            newbuilding.save()
+
+        
         path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data.csv')
         data = []
         with open(path, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 data.append(row)
-        dict1 = {}
-        dict2 = {}
-        for i in range(1, 6):
-            dict1[str(i)] = Campus.objects.get(pk=i)
 
-        for i in range(1, 7):
-            dict2[str(i)] = Building_Type.objects.get(pk=i)   
+               
         for row in data:
             newbuilding = Building(building_name = row[1], campus = dict1[row[0]], type = dict2[row[2]])
             newbuilding.save()

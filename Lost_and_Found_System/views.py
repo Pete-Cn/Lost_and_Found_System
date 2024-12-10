@@ -36,7 +36,7 @@ def login_page(request):
                 if  next != "":
                     return redirect(next)
                 else:
-                    return redirect(reverse('index'))
+                    return redirect(reverse('board:index'))
             else:
                 return render(request, 'login.html', {"error_message": "用户名或密码错误"})
         else:
