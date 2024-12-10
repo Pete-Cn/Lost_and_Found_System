@@ -5,4 +5,5 @@ app_name = "board"
 
 urlpatterns = [
     path("report/", views.report_page, name="report_page"),
+    path("", views.index, name="index")
 ]

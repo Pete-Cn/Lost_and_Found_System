@@ -19,4 +19,11 @@ function check() {
         alert("两次密码不一致");
         return false;
     }
+/*    
+    var last = email.match("@mail.ustc.edu.cn");
+    if (last == null || last == "") {
+        alert("必须用科大邮箱注册");
+        return false;
+    }
+*/
 }

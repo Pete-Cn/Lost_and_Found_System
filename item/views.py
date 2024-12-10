@@ -190,22 +190,26 @@ def post_page(request):
         }
         return render(request, "post_page.html", context)
 
+@login_required
 def loaddata(request):
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data.csv')
-    data = []
-    with open(path, 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            data.append(row)
-    dict1 = {}
-    dict2 = {}
-    for i in range(1, 6):
-        dict1[str(i)] = Campus.objects.get(pk=i)
+    if request.user.is_staff == True:
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data.csv')
+        data = []
+        with open(path, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                data.append(row)
+        dict1 = {}
+        dict2 = {}
+        for i in range(1, 6):
+            dict1[str(i)] = Campus.objects.get(pk=i)
 
-    for i in range(1, 7):
-        dict2[str(i)] = Building_Type.objects.get(pk=i)   
-    for row in data:
-        newbuilding = Building(building_name = row[1], campus = dict1[row[0]], type = dict2[row[2]])
-        newbuilding.save()
-        print(row[0])
-    return HttpResponse(data)
+        for i in range(1, 7):
+            dict2[str(i)] = Building_Type.objects.get(pk=i)   
+        for row in data:
+            newbuilding = Building(building_name = row[1], campus = dict1[row[0]], type = dict2[row[2]])
+            newbuilding.save()
+
+        return HttpResponse("成功加载校内建筑数据")
+    else:
+        return render(request, "index.html", {'error_message': "您无权查看此页面"})

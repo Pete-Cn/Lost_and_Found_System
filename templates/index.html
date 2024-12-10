@@ -5,11 +5,26 @@
 {% endblock %}
 
 {% block body %}
-
 {% if error_message %}
 <script>
     alert("{{error_message}}");
 </script>
 {% endif %}
-
+<div class="container-lg p-2 my-4">
+    {% if Notice %}
+        
+                {% for notice in Notice %}
+                <div class="card py-3 m-5 px-2">
+                    <div class="card-title px-4 py-1 border-bottom">
+                        <h2>{{ notice.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        {{ notice.detail.content|safe  }}
+                   
+                </div>
+            </div>
+                {% endfor %}
+          
+    {% endif %}
+</div>
 {% endblock %}
