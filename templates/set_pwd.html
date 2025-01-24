@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    修改密码
+{% endblock %}
+
+{% block head %}
+{% load static %}
+{% endblock %}
+
+{% block body %}
+{% if error_message %}
+<script>
+    alert("{{error_message}}");
+</script>
+
+{% endif %}
+<div class="container-lg d-flex justify-content-center mt-5 w-50">
+    <div class="border border-1 mt-5 mb-5 py-5 px-3">
+
+        <form name="myform" onsubmit="return check()" method="post" class="d-flex row align-items-center form-floating">
+            {% csrf_token %}
+            <div class="row-cols-1  justify-content-center">
+                <div class="col-lg-10 offset-lg-1 text-center px-2 pb-5">
+                    <h1>修改密码</h1>
+                </div>
+
+                <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                    <label>新密码：</label>
+                    <input type="password" name="password1" class="form-control form-control-md" placeholder="新密码">
+                </div>
+                <div class="col-lg-10 offset-lg-1 justify-content-starter px-2 pb-4">
+                    <label>重复密码：</label>
+                    <input type="password" name="password2" class="form-control form-control-md" placeholder="重复密码">
+                </div>
+            </div>
+
+            <div class="row-cols-1 gy-2 me-0 justify-content-center ">
+                <div class="col-lg-10 offset-lg-1 p-2 pb-4 text-center">
+                    <button class="w-100 btn btn-md btn-primary" type="submit" id="submit">修改密码</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script scr="{% static '\js\check.js' %}"></script>
+<script scr="{% static '\js\set_pwd.js' %}"></script>
+
+{% endblock %}

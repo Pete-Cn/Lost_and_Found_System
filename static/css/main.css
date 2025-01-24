@@ -1,0 +1,20 @@
+label {
+    font-size:large;
+    align-self: self-start;
+}
+p {
+    font-size: large;
+}
+a {
+    text-decoration:none;
+    font-size: large;
+}
+li {
+    font-size: medium;
+}
+img {
+    max-height: 100%;
+    max-width: 100%;
+    height: auto;
+    width: auto;
+}

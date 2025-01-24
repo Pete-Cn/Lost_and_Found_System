@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    首页
+{% endblock %}
+
+{% block body %}
+{% if error_message %}
+<script>
+    alert("{{error_message}}");
+</script>
+{% endif %}
+<div class="container-lg p-2 my-4">
+    {% if Notice %}
+        
+                {% for notice in Notice %}
+                <div class="card py-3 mx-5 px-2 mb-5 mt-3">
+
+                    <div class="card-body">
+                        {{ notice.detail.content|safe  }}
+                   
+                </div>
+            </div>
+                {% endfor %}
+          
+    {% endif %}
+</div>
+{% endblock %}
